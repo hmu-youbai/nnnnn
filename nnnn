@@ -1,0 +1,75 @@
+setwd("C:/Users/0.0/Desktop/11aa")####sam去掉抬头    #########################r2.sam位置
+r2_sam=read.table("1015s.sam",header=F,na.strings = c("NA"),fill=TRUE,comment.char ="",quote="")###########r2.sam名字
+{xulieming=r2_sam$V1
+  zhengfu=r2_sam$V2
+  chr=r2_sam$V3
+  pos=r2_sam$V4
+  r2xulie=r2_sam$V10
+  zhengfu[which(zhengfu==272)] <-16
+  zhengfu[which(zhengfu==256)] <-0
+  noid=which(zhengfu==4)
+  if(length(noid)!=0){
+    xulieming=xulieming[-noid]
+    zhengfu=zhengfu[-noid]
+    chr=chr[-noid]
+    pos=pos[-noid]
+    r2xulie=r2xulie[-noid]
+  }
+  r2_guolvhou=data.frame(xulieming,zhengfu,chr,pos,r2xulie)
+}
+
+
+ziji=which(r2_guolvhou$zhengfu==0)
+num=sample(ziji, 10000,replace = F)
+test1=r2_guolvhou[num,]
+
+setwd("C:/Users/0.0/Documents/")  ###################################处理后参考基因组位置
+ccname=read.table("shushu0/ccname.txt",header = F,comment.char ="",quote="")##############################处理后参考基因组list
+for (i in ccname$V1){
+  j=paste("shushu0/",i,sep='')
+  n<-read.table(j,header =T,na.strings = c("NA"),fill=TRUE)$V1
+  assign(i,n)
+}
+
+
+kbkb=c()
+hh=""
+for (i in 1:10000){
+    if(floor((test1$pos[i])/60)+2-21<0){
+      for (j in 1:40){
+        hh=paste(hh,get(chr[i])[j+1],sep="")
+      }
+    }
+    else if(floor((test1$pos[i])/60)+2+21>length(get(test1$chr[i]))){
+      for (j in length(get(test1$chr[i]))-40:length(get(test1$chr[i]))) {
+        hh=paste(hh,get(chr[i])[j],sep="")
+      }
+      
+    }
+    else{
+      for (j in 1:40){
+        hh=paste(hh,get(test1$chr[i])[floor((test1$pos[i])/60)+j+2-20],sep="")
+      }
+    }
+    
+    kbkb=append(kbkb,hh)
+    hh=""
+}
+    
+write.table(kbkb,"kbkb",row.names = FALSE,
+            col.names = FALSE,quote=FALSE)
+      
+  
+#######################################################################
+setwd("C:/Users/0.0/Desktop/11aa")
+kbkb1=read.table("kbkb")$V1
+rawr2=read.table("r2raw")
+
+for(i in 1:10000){
+  bbb=kbkb1[i]
+  nr2=which(rawr2$V1==strsplit(test1$xulieming[i],"_")[[1]][2])
+  rrrr2=rawr2$V2[nr2]
+  rrrr2_2=rrrr2[nchar(test1$r2xulie[i])+1:nchar(rrrr2)]
+}
+
+
